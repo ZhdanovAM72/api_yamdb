@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from reviews.validators import UsernameValidator, me_validator
+
 TEXT_LENGTH = 25
 
 USER = 'user'
@@ -16,11 +18,13 @@ CHOICE_ROLE = (
 
 class User(AbstractUser):
     """Переопределяем модель пользователей."""
+
     username = models.CharField(
         verbose_name='Username пользователя',
         max_length=150,
         null=False,
         unique=True,
+        username_validator=(UsernameValidator(), me_validator),
         blank=False,
     )
     email = models.EmailField(
@@ -29,16 +33,6 @@ class User(AbstractUser):
         null=False,
         unique=True,
         blank=False,
-    )
-    first_name = models.CharField(
-        verbose_name='Имя',
-        max_length=150,
-        blank=True,
-    )
-    last_name = models.CharField(
-        verbose_name='Фамилия',
-        max_length=150,
-        blank=True,
     )
     bio = models.TextField(
         verbose_name='Биография пользователя',
@@ -62,6 +56,8 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return self.role == ADMIN or self.is_superuser or self.is_staff
+
+    REQUIRED_FIELDS = ('email', )
 
     class Meta:
         ordering = ('id',)
