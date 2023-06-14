@@ -89,7 +89,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
@@ -106,6 +106,8 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
+# Указываем нашу модель User в качестве используемой
+AUTH_USER_MODEL = 'reviews.User'
 
 # DRF settings, необходимо дописать (фильтры/пагинация)
 REST_FRAMEWORK = {
