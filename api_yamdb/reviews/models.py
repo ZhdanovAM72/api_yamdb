@@ -100,6 +100,7 @@ class GenreTitle(models.Model):
     genre = models.ForeignKey(
         Genre,
         on_delete=models.CASCADE,
+        through='GenreTitle',
         verbose_name='Жанр'
     )
     title = models.ForeignKey(
