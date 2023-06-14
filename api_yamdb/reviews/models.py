@@ -98,7 +98,6 @@ class Title(models.Model):
         Genre,
         related_name='titles',
         verbose_name='Жанр произведения',
-        null=True,
     )
 
     class Meta:

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
+from reviews.models import Category, Genre, GenreTitle, Title
 
 
 @admin.register(Category)
@@ -42,9 +42,6 @@ class TitleAdmin(admin.ModelAdmin):
         'year',
         'description',
         'category',
-        'get_genre',
-        'count_reviews',
-        'get_rating'
     )
     list_filter = ('name',)
     search_fields = ('name', 'year', 'category')
@@ -62,9 +59,3 @@ class GenreTitleAdmin(admin.ModelAdmin):
     )
     list_filter = ('genre',)
     search_fields = ('title',)
-
-
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Genre, GenreAdmin)
-admin.site.register(Title, TitleAdmin)
-admin.site.register(GenreTitle, GenreTitleAdmin)
