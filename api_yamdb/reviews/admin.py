@@ -22,6 +22,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+    """Настройка админки для отзывов."""
     list_display = (
         'pk',
         'title',
@@ -37,6 +38,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
+    """Настройка админки для комментариев."""
     list_display = (
         'pk',
         'review',
