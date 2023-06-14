@@ -1,11 +1,8 @@
 from datetime import datetime
 
 from django.db import models
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-    RegexValidator
-)
+from django.core.validators import MaxValueValidator
+
 
 TEXT_LENGTH = 25
 
