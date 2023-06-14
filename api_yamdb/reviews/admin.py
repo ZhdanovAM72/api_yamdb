@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from reviews.models import Category, Genre, GenreTitle, Title
+from reviews.models import Category, Genre, GenreTitle, Title, User
 
 
 @admin.register(Category)
@@ -59,3 +59,20 @@ class GenreTitleAdmin(admin.ModelAdmin):
     )
     list_filter = ('genre',)
     search_fields = ('title',)
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    """Настройка админки для пользователей."""
+    list_display = (
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'bio',
+        'role',
+    )
+    list_editable = ('role',)
+    search_fields = ('role', 'username')
+    list_filter = ('role', 'username')
+    empty_value_display = '-пусто-'
