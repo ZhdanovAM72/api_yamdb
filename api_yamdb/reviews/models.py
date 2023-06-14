@@ -1,5 +1,6 @@
+'''
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-
 
 TEXT_LENGTH = 25
 
@@ -99,7 +100,9 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор')
-    score = models.PositiveSmallIntegerField(verbose_name='Оценка')
+    score = models.PositiveSmallIntegerField(
+        verbose_name='Оценка',
+        validators=[MinValueValidator(1), MaxValueValidator(10)])
     pub_date = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
@@ -110,7 +113,7 @@ class Review(models.Model):
         verbose_name_plural = "Отзывы"
 
     def __str__(self):
-        return self.text
+        return self.text[:TEXT_LENGTH]
 
 
 class Comment(models.Model):
@@ -136,4 +139,5 @@ class Comment(models.Model):
         verbose_name_plural = "Комментарии"
 
     def __str__(self):
-        return self.text
+        return self.text[:TEXT_LENGTH]
+'''
