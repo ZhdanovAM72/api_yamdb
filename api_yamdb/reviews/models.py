@@ -1,4 +1,11 @@
+from datetime import datetime
+
 from django.db import models
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    RegexValidator
+)
 
 TEXT_LENGTH = 25
 
@@ -13,6 +20,10 @@ class Genre(models.Model):
     slug = models.SlugField(
         max_length=50,
         verbose_name='slug',
+        validators=[RegexValidator(
+            regex=r'^[-a-zA-Z0-9_]+$',
+            message='В слаге жанра содержится недопустимый символ'
+        )],
         unique=True,
     )
 
@@ -35,6 +46,10 @@ class Category(models.Model):
     slug = models.SlugField(
         max_length=50,
         verbose_name='slug',
+        validators=[RegexValidator(
+            regex=r'^[-a-zA-Z0-9_]+$',
+            message='В слаге категории содержится недопустимый символ'
+        )],
         unique=True,
     )
 
@@ -48,7 +63,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    """Модель тайтла."""
+    """Модель произведения."""
     name = models.CharField(
         max_length=256,
         verbose_name='Hазвание произведения',
@@ -57,11 +72,21 @@ class Title(models.Model):
     year = models.PositiveIntegerField(
         verbose_name='год выпуска',
         db_index=True,
+        validators=[
+            MinValueValidator(
+                0,
+                message='Значение может быть только положительным числом.'
+            ),
+            MaxValueValidator(
+                int(datetime.now().year),
+                message='Значение в поле не должно превышать текущий год.'
+            )
+        ],
     )
     category = models.ForeignKey(
         Category,
-        help_text='Категория произведения',
-        on_delete=models.CASCADE,
+        verbose_name='Категория произведения',
+        on_delete=models.SET_NULL,
         related_name='titles',
         null=True,
     )
@@ -69,11 +94,11 @@ class Title(models.Model):
         verbose_name='Краткое описание',
         blank=True
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Жанр произведения',
+        null=True,
     )
 
     class Meta:
@@ -83,3 +108,26 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name[:TEXT_LENGTH]
+
+
+class GenreTitle(models.Model):
+    """Rласс, связывающий жанры и произведения."""
+
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        verbose_name='Жанр'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение'
+    )
+
+    class Meta:
+        verbose_name = 'Произведение относится к жанру'
+        verbose_name_plural = 'Произведение относится к жанрам'
+        ordering = ('id',)
+
+    def __str__(self):
+        return f'{self.title} принадлежит жанру/ам {self.genre}'
