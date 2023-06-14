@@ -162,7 +162,7 @@ class Title(models.Model):
     )
     genre = models.ForeignKey(
         Genre,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,  # SET_NULL при миграциях выдавал ошибку, получилось запустить через DO_NOTHING
         related_name='titles',
         verbose_name='Жанр произведения',
     )
