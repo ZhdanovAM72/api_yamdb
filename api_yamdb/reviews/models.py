@@ -20,10 +20,6 @@ class Genre(models.Model):
     slug = models.SlugField(
         max_length=50,
         verbose_name='slug',
-        validators=[RegexValidator(
-            regex=r'^[-a-zA-Z0-9_]+$',
-            message='В слаге жанра содержится недопустимый символ'
-        )],
         unique=True,
     )
 
@@ -46,10 +42,6 @@ class Category(models.Model):
     slug = models.SlugField(
         max_length=50,
         verbose_name='slug',
-        validators=[RegexValidator(
-            regex=r'^[-a-zA-Z0-9_]+$',
-            message='В слаге категории содержится недопустимый символ'
-        )],
         unique=True,
     )
 
@@ -73,10 +65,6 @@ class Title(models.Model):
         verbose_name='год выпуска',
         db_index=True,
         validators=[
-            MinValueValidator(
-                0,
-                message='Значение может быть только положительным числом.'
-            ),
             MaxValueValidator(
                 int(datetime.now().year),
                 message='Значение в поле не должно превышать текущий год.'
@@ -110,7 +98,7 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    """Rласс, связывающий жанры и произведения."""
+    """Kласс, связывающий жанры и произведения."""
 
     genre = models.ForeignKey(
         Genre,
