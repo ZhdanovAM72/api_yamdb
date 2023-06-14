@@ -1,6 +1,9 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.tokens import default_token_generator
 
 from reviews.validators import UsernameValidator, me_validator
 
@@ -25,7 +28,7 @@ class User(AbstractUser):
         max_length=150,
         null=False,
         unique=True,
-        username_validator=(UsernameValidator(), me_validator),
+        validators=(UsernameValidator(), me_validator),
         blank=False,
     )
     email = models.EmailField(
@@ -43,6 +46,13 @@ class User(AbstractUser):
         verbose_name='Роль',
         max_length=max(len(role_name) for role_name, role_dis in CHOICE_ROLE),
         choices=CHOICE_ROLE,
+    )
+    confirmation_code = models.CharField(
+        'код API на почту',
+        max_length=255,
+        null=True,
+        blank=False,
+        default='default_code'
     )
 
     @property
@@ -72,6 +82,16 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username[:TEXT_LENGTH]} {self.role}'
+
+
+@receiver(post_save, sender=User)
+def post_save(sender, instance, created, **kwargs):
+    if created:
+        confirmation_code = default_token_generator.make_token(
+            instance
+        )
+        instance.confirmation_code = confirmation_code
+        instance.save()
 
 
 class Genre(models.Model):
@@ -142,7 +162,7 @@ class Title(models.Model):
     )
     genre = models.ForeignKey(
         Genre,
-        on_delete=models.SET_NULL,
+        on_delete=models.DO_NOTHING,
         related_name='titles',
         verbose_name='Жанр произведения',
     )
