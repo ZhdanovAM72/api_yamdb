@@ -13,7 +13,7 @@ from api.serializers import (AnyUserSerializer,
                              AdminUsersSerializer,
                              LoginSerializer,
                              TokenSerializer)
-from api.permissions import AdminOnly
+from api.permissions import AdminOnly, AdminAuthorOrReadOnly
 
 
 class UserViewSet(ModelViewSet):
@@ -21,40 +21,32 @@ class UserViewSet(ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = AdminUsersSerializer
-    permission_classes = (IsAuthenticated, AdminOnly)
+    permission_classes = (AdminOnly,)
     search_fields = ('username', )
 
     @action(
         methods=['GET', 'PATCH'],
         permission_classes=(IsAuthenticated,),
         url_path='me',
-        detail=True,
+        detail=False,
+        url_name='me',
     )
     def get_patch_user_info(self, request):
         serializer = AdminUsersSerializer(request.user)
-
-        if request.method == 'PATH':
-            if request.user.is_admin:
-                serializer = AdminUsersSerializer(
-                    request.user,
-                    partial=True,
-                    data=request.data,
-                )
-            else:
-                serializer = AnyUserSerializer(
-                    request.user,
-                    partial=True,
-                    data=request.data,
-                )
+        if request.method == 'PATCH':
+            serializer = AdminUsersSerializer(
+                request.user, data=request.data, partial=True
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ApiUserSignup(APIView):
     """Код подтверждения для получения токена."""
 
+    serializer_class = AdminUsersSerializer
     permission_classes = (AllowAny,)
 
     @staticmethod
@@ -80,12 +72,14 @@ class ApiUserSignup(APIView):
             'to_email': user.email,
             'email_subject': 'API код для доступа.'
         }
-        self.send_email(email_data)
+        self.emails_send(email_data)
         return Response(status=status.HTTP_200_OK)
 
 
 class GetApiToken(APIView):
     """Создание токена по коду из письма."""
+
+    serializer_class = TokenSerializer
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
