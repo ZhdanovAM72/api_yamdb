@@ -45,3 +45,10 @@ class AuthorOrModeratorsOrReadOnly(permissions.BasePermission):
             or request.user.is_moderator
             or obj.author == request.user
         )
+
+
+class AnonReadOnly(permissions.BasePermission):
+    """Анонимный пользователь и только безопасные запросы."""
+
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
