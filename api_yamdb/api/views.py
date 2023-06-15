@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.filters import SearchFilter
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
@@ -13,7 +14,9 @@ from api.serializers import (AnyUserSerializer,
                              AdminUsersSerializer,
                              LoginSerializer,
                              TokenSerializer)
-from api.permissions import AdminOnly, AdminAuthorOrReadOnly
+from api.permissions import (AdminOnly,
+                             AdminAuthorOrReadOnly,
+                             AuthorOrModeratorsOrReadOnly)
 
 
 class UserViewSet(ModelViewSet):
@@ -21,8 +24,11 @@ class UserViewSet(ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = AdminUsersSerializer
-    permission_classes = (AdminOnly,)
+    permission_classes = (IsAuthenticated, AdminOnly,)
+    lookup_field = 'username'
+    filter_backends = (SearchFilter,)
     search_fields = ('username', )
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         methods=['GET', 'PATCH'],
@@ -34,9 +40,18 @@ class UserViewSet(ModelViewSet):
     def get_patch_user_info(self, request):
         serializer = AdminUsersSerializer(request.user)
         if request.method == 'PATCH':
-            serializer = AdminUsersSerializer(
-                request.user, data=request.data, partial=True
-            )
+            if request.user.is_admin:
+                serializer = AdminUsersSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True
+                )
+            else:
+                serializer = AnyUserSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True
+                )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -46,7 +61,6 @@ class UserViewSet(ModelViewSet):
 class ApiUserSignup(APIView):
     """Код подтверждения для получения токена."""
 
-    serializer_class = AdminUsersSerializer
     permission_classes = (AllowAny,)
 
     @staticmethod
@@ -65,15 +79,15 @@ class ApiUserSignup(APIView):
         user = serializer.save()
         email_text = (
             f'Привет {user.username}!'
-            f'Это твой код для подключения к API: {user.confirmation_code}'
+            f'Это код для API: {user.confirmation_code}'
         )
         email_data = {
             'email_body': email_text,
             'to_email': user.email,
-            'email_subject': 'API код для доступа.'
+            'email_subject': 'API код для доступа!'
         }
         self.emails_send(email_data)
-        return Response(status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetApiToken(APIView):
