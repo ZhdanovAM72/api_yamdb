@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import default_token_generator
 
-from reviews.validators import UsernameValidator, me_validator
+from reviews.validators import me_validator
 
 TEXT_LENGTH = 25
 
@@ -28,7 +28,7 @@ class User(AbstractUser):
         max_length=150,
         null=False,
         unique=True,
-        validators=(UsernameValidator(), me_validator),
+        validators=(me_validator, AbstractUser.username_validator),
         blank=False,
     )
     email = models.EmailField(
