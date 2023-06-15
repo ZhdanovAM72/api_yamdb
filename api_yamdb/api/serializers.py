@@ -51,7 +51,6 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор отзывов."""
-
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True

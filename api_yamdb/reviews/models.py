@@ -1,8 +1,12 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import datetime
+
 from django.db import models
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 
 from reviews.validators import UsernameValidator, me_validator
+
 
 TEXT_LENGTH = 25
 
@@ -119,7 +123,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    """Модель тайтла."""
+    """Модель произведения."""
     name = models.CharField(
         max_length=256,
         verbose_name='Hазвание произведения',
@@ -128,11 +132,17 @@ class Title(models.Model):
     year = models.PositiveIntegerField(
         verbose_name='год выпуска',
         db_index=True,
+        validators=[
+            MaxValueValidator(
+                int(datetime.now().year),
+                message='Значение в поле не должно превышать текущий год.'
+            )
+        ],
     )
     category = models.ForeignKey(
         Category,
-        help_text='Категория произведения',
-        on_delete=models.CASCADE,
+        verbose_name='Категория произведения',
+        on_delete=models.SET_NULL,
         related_name='titles',
         null=True,
     )
@@ -140,9 +150,8 @@ class Title(models.Model):
         verbose_name='Краткое описание',
         blank=True
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='Жанр произведения',
     )
@@ -154,6 +163,30 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name[:TEXT_LENGTH]
+
+
+class GenreTitle(models.Model):
+    """Kласс, связывающий жанры и произведения."""
+
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        through='GenreTitle',
+        verbose_name='Жанр'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение'
+    )
+
+    class Meta:
+        verbose_name = 'Произведение относится к жанру'
+        verbose_name_plural = 'Произведение относится к жанрам'
+        ordering = ('id',)
+
+    def __str__(self):
+        return f'{self.title} принадлежит жанру/ам {self.genre}'
 
 
 class Review(models.Model):
