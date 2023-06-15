@@ -46,6 +46,7 @@ class User(AbstractUser):
         verbose_name='Роль',
         max_length=max(len(role_name) for role_name, role_dis in CHOICE_ROLE),
         choices=CHOICE_ROLE,
+        default=USER,
     )
     confirmation_code = models.CharField(
         'код API на почту',
@@ -71,12 +72,12 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ('id',)
-        constraints = [
-            models.UniqueConstraint(
-                fields=('username', 'email'),
-                name='unique_user_data',
-            )
-        ]
+        # constraints = [
+        #     models.UniqueConstraint(
+        #         fields=('username', 'email'),
+        #         name='unique_user_data',
+        #     )
+        # ]
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
@@ -162,7 +163,7 @@ class Title(models.Model):
     )
     genre = models.ForeignKey(
         Genre,
-        on_delete=models.SET_NULL,  # SET_NULL при миграциях выдавал ошибку, получилось запустить через DO_NOTHING
+        on_delete=models.DO_NOTHING,  # SET_NULL при миграциях выдавал ошибку, получилось запустить через DO_NOTHING
         related_name='titles',
         verbose_name='Жанр произведения',
     )
