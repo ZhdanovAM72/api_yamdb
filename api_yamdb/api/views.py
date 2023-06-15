@@ -3,17 +3,22 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.filters import SearchFilter
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import (IsAuthenticated,
+                                        AllowAny,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
 
 from api_yamdb.settings import EMAIL_ADMIN
-from reviews.models import User
+from reviews.models import User, Review, Title
 from api.serializers import (AnyUserSerializer,
                              AdminUsersSerializer,
                              LoginSerializer,
-                             TokenSerializer)
+                             TokenSerializer,
+                             CommentSerializer,
+                             ReviewSerializer)
 from api.permissions import (AdminOnly,
                              AdminAuthorOrReadOnly,
                              AuthorOrModeratorsOrReadOnly)
@@ -111,3 +116,48 @@ class GetApiToken(APIView):
         return Response(
             {'confirmation_code': 'Указан неверный код доступа к API.'},
             status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReviewViewSet(ModelViewSet):
+    """ViewSet отзывов."""
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          AuthorOrModeratorsOrReadOnly)
+
+    def get_queryset(self):
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id')
+        )
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id')
+        )
+        serializer.save(author=self.request.user, title=title)
+
+
+class CommentViewSet(ModelViewSet):
+    """ViewSet комментариев."""
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          AuthorOrModeratorsOrReadOnly)
+
+    def get_queryset(self):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id')
+        )
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id')
+        )
+        serializer.save(author=self.request.user, review=review)
+
