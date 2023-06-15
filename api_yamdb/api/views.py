@@ -8,6 +8,7 @@ from reviews.models import Review, Title
 
 
 class ReviewViewSet(ModelViewSet):
+    """ViewSet отзывов."""
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,
                           AuthorOrModeratorsOrReadOnly)
@@ -28,6 +29,7 @@ class ReviewViewSet(ModelViewSet):
 
 
 class CommentViewSet(ModelViewSet):
+    """ViewSet комментариев."""
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,
                           AuthorOrModeratorsOrReadOnly)
