@@ -15,11 +15,10 @@ from django.shortcuts import get_object_or_404
 
 from api.utils import send_confirmation_code
 from api.mixins import CreateListDestroyViewSet
+from api.filters import TitleFilter
 from api.permissions import (AdminOnly,
-                             AdminAuthorOrReadOnly,
-                             AuthorOrModeratorsOrReadOnly,
-                             AnonReadOnly,
-                             AdminOrSuperuserOnly)
+                             AdminOrReadOnly,
+                             AuthorOrModeratorsOrReadOnly)
 from api.serializers import (CategorySerializer, GenreSerializer,
                              TitleViewingSerializer, TitleEditingSerializer,
                              AnyUserSerializer, AdminUsersSerializer,
@@ -33,8 +32,6 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AnonReadOnly,
-                          AdminOrSuperuserOnly,)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -42,8 +39,6 @@ class GenreViewSet(CreateListDestroyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (AnonReadOnly,
-                          AdminOrSuperuserOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -51,9 +46,9 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     serializer_class = TitleViewingSerializer
-    permission_classes = (AnonReadOnly,
-                          AdminOrSuperuserOnly,)
+    permission_classes = (AdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         """Определяет сериализатор в зависимости от типа запроса."""

@@ -1,6 +1,6 @@
 from rest_framework import filters, mixins, viewsets
 
-from api.permissions import AnonReadOnly, AuthorOrModeratorsOrReadOnly
+from api.permissions import AnonReadOnly, AuthorOrModeratorsOrReadOnly, AdminOrReadOnly
 
 
 class CreateListDestroyViewSet(mixins.CreateModelMixin,
@@ -11,6 +11,6 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
     Вьюсет, позволяющий осуществлять GET, POST и DELETE запросы.
     """
 
-    permission_classes = (AnonReadOnly | AuthorOrModeratorsOrReadOnly,)
+    permission_classes = (AdminOrReadOnly, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
