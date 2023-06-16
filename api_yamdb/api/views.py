@@ -8,10 +8,9 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 
-from api_yamdb.settings import EMAIL_ADMIN
+from api.utils import send_confirmation_code
 from reviews.models import User, Review, Title
 from api.serializers import (AnyUserSerializer,
                              AdminUsersSerializer,
@@ -40,7 +39,6 @@ class UserViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,),
         url_path='me',
         detail=False,
-        url_name='me',
     )
     def get_patch_user_info(self, request):
         serializer = AdminUsersSerializer(request.user)
@@ -64,43 +62,32 @@ class UserViewSet(ModelViewSet):
 
 
 class ApiUserSignup(APIView):
-    """Код подтверждения для получения токена."""
+    """Регистрация новых пользователей."""
 
     permission_classes = (AllowAny,)
 
-    @staticmethod
-    def emails_send(data):
-        email = EmailMessage(
-            subject=data['email_subject'],
-            body=data['email_body'],
-            to=[data['to_email']],
-            from_email=EMAIL_ADMIN,
-        )
-        email.send()
-
     def post(self, request):
+        """Метод POST."""
+
         serializer = LoginSerializer(data=request.data)
+        if User.objects.filter(username=request.data.get('username'),
+                               email=request.data.get('email')).exists():
+            send_confirmation_code(request)
+            return Response(request.data, status=status.HTTP_200_OK)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        email_text = (
-            f'Привет {user.username}!'
-            f'Это код для API: {user.confirmation_code}'
-        )
-        email_data = {
-            'email_body': email_text,
-            'to_email': user.email,
-            'email_subject': 'API код для доступа!'
-        }
-        self.emails_send(email_data)
+        serializer.save()
+        send_confirmation_code(request)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetApiToken(APIView):
     """Создание токена по коду из письма."""
 
-    serializer_class = TokenSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request):
+        """Метод POST."""
+
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -160,4 +147,3 @@ class CommentViewSet(ModelViewSet):
             title_id=self.kwargs.get('title_id')
         )
         serializer.save(author=self.request.user, review=review)
-
