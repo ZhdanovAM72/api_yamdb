@@ -1,12 +1,10 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from api.views import (CommentViewSet,
-                       ReviewViewSet,
-                       UserViewSet,
-                       ApiUserSignup,
-                       GetApiToken)
-
+from api.views import (CommentViewSet, ReviewViewSet,
+                       UserViewSet, ApiUserSignup,
+                       GetApiToken, CategoryViewSet,
+                       GenreViewSet, TitleViewSet)
 
 app_name = 'api'
 
@@ -23,6 +21,22 @@ router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
     basename='comment'
+)
+
+router.register(
+    'categories',
+    CategoryViewSet,
+    basename='categories'
+)
+router.register(
+    'genres',
+    GenreViewSet,
+    basename='genres'
+)
+router.register(
+    'titles',
+    TitleViewSet,
+    basename='titles'
 )
 
 urlpatterns = [
