@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
+from api.filters import TitleFilter
 from api.utils import send_confirmation_code
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (AdminOnly,
@@ -34,6 +35,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (AdminOrReadOnly,)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -41,15 +43,17 @@ class GenreViewSet(CreateListDestroyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')).order_by('id')
     serializer_class = TitleViewingSerializer
     permission_classes = (AdminOrReadOnly,)  # заменил права
     filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         """Определяет сериализатор в зависимости от типа запроса."""
@@ -151,7 +155,7 @@ class ReviewViewSet(ModelViewSet):
             Title,
             id=self.kwargs.get('title_id')
         )
-        return title.reviews.all()
+        return title.reviews.all().order_by('id')
 
     def perform_create(self, serializer):
         title = get_object_or_404(
@@ -173,7 +177,7 @@ class CommentViewSet(ModelViewSet):
             id=self.kwargs.get('review_id'),
             title_id=self.kwargs.get('title_id')
         )
-        return review.comments.all()
+        return review.comments.all().order_by('id')
 
     def perform_create(self, serializer):
         review = get_object_or_404(
