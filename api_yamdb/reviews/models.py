@@ -56,7 +56,6 @@ class User(AbstractUser):
         max_length=255,
         null=True,
         blank=False,
-        default='default_code'
     )
 
     @property
@@ -71,16 +70,8 @@ class User(AbstractUser):
     def is_admin(self):
         return self.role == ADMIN or self.is_superuser or self.is_staff
 
-    REQUIRED_FIELDS = ('email', )
-
     class Meta:
         ordering = ('id',)
-        # constraints = [
-        #     models.UniqueConstraint(
-        #         fields=('username', 'email'),
-        #         name='unique_user_data',
-        #     )
-        # ]
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
