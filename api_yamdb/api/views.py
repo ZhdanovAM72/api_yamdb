@@ -1,8 +1,11 @@
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.filters import SearchFilter
-from rest_framework import status
 from rest_framework.permissions import (IsAuthenticated,
                                         AllowAny,
                                         IsAuthenticatedOrReadOnly)
@@ -12,16 +15,52 @@ from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 
 from api_yamdb.settings import EMAIL_ADMIN
-from reviews.models import User, Review, Title
-from api.serializers import (AnyUserSerializer,
-                             AdminUsersSerializer,
-                             LoginSerializer,
-                             TokenSerializer,
-                             CommentSerializer,
-                             ReviewSerializer)
+from api.mixins import CreateListDestroyViewSet
 from api.permissions import (AdminOnly,
                              AdminAuthorOrReadOnly,
-                             AuthorOrModeratorsOrReadOnly)
+                             AuthorOrModeratorsOrReadOnly, 
+                             AnonReadOnly,
+                             AdminOrSuperuserOnly)
+from api.serializers import (CategorySerializer, GenreSerializer,
+                             TitleViewingSerializer, TitleEditingSerializer,
+                             AnyUserSerializer, AdminUsersSerializer,
+                             LoginSerializer, TokenSerializer,
+                             CommentSerializer, ReviewSerializer)
+from reviews.models import Category, Genre, Title, User, Review
+
+
+class CategoryViewSet(CreateListDestroyViewSet):
+    """Вьюсет для категорий."""
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (AnonReadOnly,
+                          AdminOrSuperuserOnly,)
+
+
+class GenreViewSet(CreateListDestroyViewSet):
+    """Вьюсет для жанров."""
+
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (AnonReadOnly,
+                          AdminOrSuperuserOnly,)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
+
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    serializer_class = TitleViewingSerializer
+    permission_classes = (AnonReadOnly,
+                          AdminOrSuperuserOnly,)
+    filter_backends = (DjangoFilterBackend,)
+
+    def get_serializer_class(self):
+        """Определяет сериализатор в зависимости от типа запроса."""
+        if self.request.method == 'GET':
+            return TitleViewingSerializer
+        return TitleEditingSerializer
 
 
 class UserViewSet(ModelViewSet):
@@ -160,4 +199,3 @@ class CommentViewSet(ModelViewSet):
             title_id=self.kwargs.get('title_id')
         )
         serializer.save(author=self.request.user, review=review)
-
