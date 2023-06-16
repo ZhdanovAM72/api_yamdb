@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404
 
 from api_yamdb.settings import EMAIL_ADMIN
 from api.mixins import CreateListDestroyViewSet
+from .filters import TitleFilter
 from api.permissions import (AdminOnly,
                              AdminAuthorOrReadOnly,
                              AuthorOrModeratorsOrReadOnly, 
@@ -55,6 +56,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (AnonReadOnly,
                           AdminOrSuperuserOnly,)
     filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         """Определяет сериализатор в зависимости от типа запроса."""
