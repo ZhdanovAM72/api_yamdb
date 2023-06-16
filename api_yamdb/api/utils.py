@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 
 from reviews.models import User
+from api_yamdb.settings import EMAIL_ADMIN
 
 
 def send_confirmation_code(request):
@@ -17,6 +18,6 @@ def send_confirmation_code(request):
     send_mail(
         'Код для получения токена к API',
         f'Код подтверждения {user.confirmation_code}',
-        'token_API@yamdb.ru',
+        f'{EMAIL_ADMIN}',
         [request.data.get('email')],
     )
