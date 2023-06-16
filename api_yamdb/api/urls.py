@@ -28,7 +28,5 @@ router.register(
 urlpatterns = [
     path('v1/auth/token/', GetApiToken.as_view(), name='get_token'),
     path('v1/auth/signup/', ApiUserSignup.as_view(), name='signup'),
-
-urlpatterns = [
     path('v1/', include(router.urls)),
 ]
