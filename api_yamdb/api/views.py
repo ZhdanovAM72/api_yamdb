@@ -18,7 +18,7 @@ from api_yamdb.settings import EMAIL_ADMIN
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (AdminOnly,
                              AdminAuthorOrReadOnly,
-                             AuthorOrModeratorsOrReadOnly, 
+                             AuthorOrModeratorsOrReadOnly,
                              AnonReadOnly,
                              AdminOrSuperuserOnly)
 from api.serializers import (CategorySerializer, GenreSerializer,
