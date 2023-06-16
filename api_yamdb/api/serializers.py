@@ -51,9 +51,6 @@ class TokenSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.ModelSerializer):
     """Сериализатор получения кода на почту пользователя."""
 
-    def validate_username(self, value):
-        return me_validator(value)
-
     class Meta:
         model = User
         fields = ('username', 'email')

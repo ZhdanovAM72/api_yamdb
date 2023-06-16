@@ -1,6 +1,6 @@
 from rest_framework import filters, mixins, viewsets
 
-from api.permissions import AnonReadOnly, AuthorOrModeratorsOrReadOnly, AdminOrReadOnly
+from api.permissions import AdminOrReadOnly
 
 
 class CreateListDestroyViewSet(mixins.CreateModelMixin,
@@ -14,3 +14,4 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
     permission_classes = (AdminOrReadOnly, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'

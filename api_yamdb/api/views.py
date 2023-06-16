@@ -17,8 +17,8 @@ from api.utils import send_confirmation_code
 from api.mixins import CreateListDestroyViewSet
 from api.filters import TitleFilter
 from api.permissions import (AdminOnly,
-                             AdminOrReadOnly,
-                             AuthorOrModeratorsOrReadOnly)
+                             AuthorOrModeratorsOrReadOnly,
+                             AdminOrReadOnly)
 from api.serializers import (CategorySerializer, GenreSerializer,
                              TitleViewingSerializer, TitleEditingSerializer,
                              AnyUserSerializer, AdminUsersSerializer,
