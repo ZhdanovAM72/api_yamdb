@@ -19,7 +19,8 @@ from api.permissions import (AdminOnly,
                              AdminAuthorOrReadOnly,
                              AuthorOrModeratorsOrReadOnly,
                              AnonReadOnly,
-                             AdminOrSuperuserOnly)
+                             AdminOrSuperuserOnly,
+                             AdminOrReadOnly)
 from api.serializers import (CategorySerializer, GenreSerializer,
                              TitleViewingSerializer, TitleEditingSerializer,
                              AnyUserSerializer, AdminUsersSerializer,
@@ -33,8 +34,6 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AnonReadOnly,
-                          AdminOrSuperuserOnly,)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -42,8 +41,6 @@ class GenreViewSet(CreateListDestroyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (AnonReadOnly,
-                          AdminOrSuperuserOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -51,8 +48,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     serializer_class = TitleViewingSerializer
-    permission_classes = (AnonReadOnly,
-                          AdminOrSuperuserOnly,)
+    permission_classes = (AdminOrReadOnly,)  # заменил права
     filter_backends = (DjangoFilterBackend,)
 
     def get_serializer_class(self):
