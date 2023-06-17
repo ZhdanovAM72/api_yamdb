@@ -1,9 +1,7 @@
 from django.db.models import Avg
-
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title, Comment, Review, User
-from reviews.validators import me_validator
 
 
 class AdminUsersSerializer(serializers.ModelSerializer):
