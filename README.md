@@ -1,4 +1,4 @@
-# Проект YaMDb
+# Яндекс Практикум - Групповой проект YaMDb.
 
 ##### Проект YaMDb собирает отзывы пользователей на произведения.Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
 ####
@@ -96,10 +96,8 @@ GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Получение
 ##### Получить код подтверждения на переданный email. Права доступа: Доступно без токена. Использовать имя 'me' в качестве username запрещено. Поля email и username должны быть уникальными.
 
 #### Получение JWT-токена в обмен на username и confirmation code.
-- Права доступа: Доступно без токена.
-####
 ```http
-  POST /v1/auth/signup/
+POST /v1/auth/signup/ - Права доступа: Доступно без токена.
 ```
 
 | Parameter | Type     | Description                |
@@ -109,9 +107,8 @@ GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Получение
 
 
 #### Получение токена для доступа к API
-- Права доступа: Доступно без токена.
 ```http
-  POST /v1/auth/token/
+POST /v1/auth/token/ - Права доступа: Доступно без токена.
 ```
 
 | Parameter | Type     | Description                       |
@@ -119,28 +116,15 @@ GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Получение
 | `username`      | `string` | **Required**. Имя пользователя |
 | `confirmation_code`      | `string` | **Required**. Код подтверждения (полученый на email) |
 
+### Категории (типы) произведений
 #### Получить список всех категорий 
-- Права доступа: Доступно без токена
 ```http
-  GET /api/v1/categories/
+GET /api/v1/categories/ - Права доступа: Доступно без токена
 ```
-```
-{
-  "count": 0,
-  "next": "string",
-  "previous": "string",
-  "results": [
-    {
-      "name": "string",
-      "slug": "ej0ymOkYK8SWjxb_de"
-    }
-  ]
-}
-```
+
 #### Добавление категории:
-- Доступ: Администратор.
 ```http
-  POST /api/v1/categories/
+POST /api/v1/categories/ - Доступ: Администратор.
 ```
 
 | Parameter | Type     | Description                       |
@@ -149,34 +133,19 @@ GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Получение
 | `slug`      | `string` | **Required**. Slug категории |
 
 #### Удаление категории:
-- Доступ: Администратор.
 ```http
-  DELETE /api/v1/categories/{slug}
+DELETE /api/v1/categories/{slug} - Доступ: Администратор.
 ```
 
 #### Получить список всех жанров. 
-- Права доступа: Доступно без токена
 ```http
-  GET /api/v1/genres/
+GET /api/v1/genres/ - Права доступа: Доступно без токена
 ```
 
-```
-{
-  "count": 0,
-  "next": "string",
-  "previous": "string",
-  "results": [
-    {
-      "name": "string",
-      "slug": "LnB6kh9iOZfAL4DavTS3DqiV6GSHhjQwpkdjOdmMyo_CBYo-rc"
-    }
-  ]
-}
-```
 #### Добавить жанр. 
-- Права доступа: Администратор. Поле slug каждого жанра должно быть уникальным.
+- Поле slug каждого жанра должно быть уникальным.
 ```http
-  POST /api/v1/genres/
+POST /api/v1/genres/ - Права доступа: Администратор. 
 ```
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
@@ -184,54 +153,172 @@ GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Получение
 | `slug`      | `string` | **Required**. Slug жанра |
 
 #### Удаление жанра:
-- Доступ: Администратор.
 ```http
-  DELETE /api/v1/genres/{slug}
+DELETE /api/v1/genres/{slug} - - Доступ: Администратор.
 ```
 ### Произведения, к которым пишут отзывы (определённый фильм, книга или песенка).
 
 #### Получить список всех произведений.
-- Права доступа: Доступно без токена
 ```http
-  GET /api/v1/titles/
+GET /api/v1/titles/ - Права доступа: Доступно без токена
 ```
 
-```
-{
-  "count": 0,
-  "next": "string",
-  "previous": "string",
-  "results": [
-    {
-      "id": 0,
-      "name": "string",
-      "year": 0,
-      "rating": 0,
-      "description": "string",
-      "genre": [
-        {
-          "name": "string",
-          "slug": "TZ1GR64y"
-        }
-      ],
-      "category": {
-        "name": "string",
-        "slug": "aubCbSudp3nqlBm99c1QqukjVxboUxf5VQkpEq9dreivEaxygc"
-      }
-    }
-  ]
-}
-```
 #### Добавить новое произведение.
-- Права доступа: Администратор. Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего). При добавлении нового произведения требуется указать уже существующие категорию и жанр.
+- Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего). При добавлении нового произведения требуется указать уже существующие категорию и жанр.
 ```http
-  GET /api/v1/titles/
+POST /api/v1/titles/ - Права доступа: Администратор.
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
 | `name`      | `string` | **Required**. Произведения |
-| `year`      | `int` | **Required**. Год |
+| `year`      | `integer` | **Required**. Год |
 | `description`      | `string` | Описание |
 | `genre`      | `string` | Жанр |
 | `category`      | `string` |  Котегория |
+
+#### Информация о произведении.
+- Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего). При добавлении нового произведения требуется указать уже существующие категорию и жанр.
+```http
+GET /api/v1/titles/{titles_id}/ - Права доступа: Администратор.
+```
+
+#### Обновить информацию о произведении.
+```http
+PATCH /api/v1/titles/{titles_id}/ - Права доступа: Администратор.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `titles_id`      | `integer` | **Required**. Произведения |
+
+#### Удалить произведение.
+```http
+DELETE /api/v1/titles/{titles_id}/ - Права доступа: Администратор.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `titles_id`      | `integer` | **Required**. Произведения |
+
+### Отзывы
+#### Получить список всех комментариев к отзыву по id.
+```http
+GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Права доступа: Доступно без токена.
+```
+
+#### Добавить новый комментарий для отзыва.
+```http
+POST /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Права доступа: Аутентифицированные пользователи.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `titles_id`      | `integer` | **Required**. ID произведения |
+| `review_id`      | `integer` | **Required**. ID отзыва |
+
+#### Получить комментарий для отзыва по id..
+```http
+GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/ - Права доступа: Доступно без токена.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `titles_id`      | `integer` | **Required**. ID произведения |
+| `review_id`      | `integer` | **Required**. ID отзыва |
+| `comment_id`      | `integer` | **Required**. ID комментария |
+
+#### Частично обновить комментарий к отзыву по id.
+```http
+PATCH /api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/ - Права доступа: Автор комментария, модератор или администратор.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `titles_id`      | `integer` | **Required**. ID произведения |
+| `review_id`      | `integer` | **Required**. ID отзыва |
+| `comment_id`      | `integer` | **Required**. ID комментария |
+
+#### Удалить комментарий к отзыву по id.
+```http
+DELETE /api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/ - Права доступа: Автор комментария, модератор или администратор.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `titles_id`      | `integer` | **Required**. ID произведения |
+| `review_id`      | `integer` | **Required**. ID отзыва |
+| `comment_id`      | `integer` | **Required**. ID комментария |
+
+### Пользователи
+#### Получить список всех пользователей.
+```http
+GET /api/v1/users/ - Права доступа: Администратор
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `search`      | `string` | Поиск по имени пользователя (username) |
+
+#### Добавить нового пользователя. 
+```http
+POST /api/v1/users/ - Права доступа: Администратор Поля email и username должны быть уникальными.
+```
+Пример:
+```
+{
+  "username": "6FYPl2UJHyBL.6r@XDrpFynuutIe2um+hv1ybTjB-vdxz",
+  "email": "user@example.com",
+  "first_name": "string",
+  "last_name": "string",
+  "bio": "string",
+  "role": "user"
+}
+```
+#### Получить пользователя по username.
+```http
+GET /api/v1/users/{username}/ - Права доступа: Администратор
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `username`      | `string` | **Required**. Username пользователя |
+
+#### Изменить данные пользователя по username.
+```http
+PATCH /api/v1/users/{username}/ - Права доступа: Администратор. Поля email и username должны быть уникальными.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `username`      | `string` | **Required**. Username пользователя |
+
+#### Удалить пользователя по username.
+```http
+DELETE /api/v1/users/{username}/ - Права доступа: Администратор.
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `username`      | `string` | **Required**. Username пользователя |
+
+#### Получить данные своей учетной записи.
+```http
+GET /api/v1/users/me/ - Права доступа: Любой авторизованный пользователь
+```
+Пример ответа API:
+```
+{
+  "username": "vF+d1l2Rw6OlgWDz",
+  "email": "user@example.com",
+  "first_name": "string",
+  "last_name": "string",
+  "bio": "string",
+  "role": "user"
+}
+```
+
+#### Изменить данные своей учетной записи.
+```http
+PATCH /api/v1/users/me/ - Права доступа: Любой авторизованный пользователь
+```
+Пример тела запроса:
+```
+{
+  "username": "5krHWYegCM+4FP1Sz",
+  "email": "user@example.com",
+  "first_name": "string",
+  "last_name": "string",
+  "bio": "string"
+}
+```

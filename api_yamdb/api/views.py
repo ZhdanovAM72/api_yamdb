@@ -17,11 +17,8 @@ from api.filters import TitleFilter
 from api.utils import send_confirmation_code
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (AdminOnly,
-                             AdminAuthorOrReadOnly,
                              AuthorOrModeratorsOrReadOnly,
                              AdminOrReadOnly,
-                             AnonReadOnly,
-                             AdminOrSuperuserOnly,
                              AdminOrReadOnly)
 from api.serializers import (CategorySerializer, GenreSerializer,
                              TitleViewingSerializer, TitleEditingSerializer,
@@ -48,7 +45,9 @@ class GenreViewSet(CreateListDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Title.objects.annotate(rating=Avg('reviews__score')).order_by('id')
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    ).order_by('id')
     serializer_class = TitleViewingSerializer
     permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
