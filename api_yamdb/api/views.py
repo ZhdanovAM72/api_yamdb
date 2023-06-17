@@ -19,6 +19,7 @@ from api.mixins import CreateListDestroyViewSet
 from api.permissions import (AdminOnly,
                              AdminAuthorOrReadOnly,
                              AuthorOrModeratorsOrReadOnly,
+                             AdminOrReadOnly,
                              AnonReadOnly,
                              AdminOrSuperuserOnly,
                              AdminOrReadOnly)
@@ -35,7 +36,6 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AdminOrReadOnly,)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -43,7 +43,6 @@ class GenreViewSet(CreateListDestroyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (AdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -51,7 +50,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).order_by('id')
     serializer_class = TitleViewingSerializer
-    permission_classes = (AdminOrReadOnly,)  # заменил права
+    permission_classes = (AdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
