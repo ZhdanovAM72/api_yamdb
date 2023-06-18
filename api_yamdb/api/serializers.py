@@ -146,7 +146,7 @@ class TitleViewingSerializer(serializers.ModelSerializer):
         model = Title
 
     def get_rating(self, obj):
-        obj = obj.reviews.all().aggregate(rating=Avg("score"))
+        obj = obj.reviews.all().aggregate(rating=Avg('score'))
         return obj["rating"]
 
 
