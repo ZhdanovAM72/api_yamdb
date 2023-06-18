@@ -22,7 +22,7 @@ class Command(BaseCommand):
     из терминала в соответствующей папке
     """
 
-    help = 'Импорт csv файлов в таблицы базы'
+    help = 'Импорт csv файлов в таблицы базы.'
 
     def _create_correct_row_fields(self, row):
         """Дополняет строку таблицы экземплярами модели."""
@@ -43,12 +43,10 @@ class Command(BaseCommand):
         return row
 
     def handle(self, *args, **options):
-        """Тело команды."""
         for i in model_csv_equal.items():
             path, model = i
             rows = 0
-            successful = 0
-            print(f'Наполняем модель {model.__name__}')
+
             with open(path, encoding='utf-8', mode='r') as file:
                 csv_read = csv.DictReader(file)
                 for row in csv_read:
@@ -56,7 +54,6 @@ class Command(BaseCommand):
                     row = self._create_correct_row_fields(row)
                     try:
                         model.objects.get_or_create(**row)
-                        successful += 1
                     except Exception as error:
                         print(f'Ошибка в строке {row.get("id")}.\n'
                               f'Текст - {error}')

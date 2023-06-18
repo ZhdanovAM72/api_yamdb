@@ -1,5 +1,4 @@
-from datetime import datetime
-
+from django.utils import timezone
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -92,7 +91,7 @@ def post_save(sender, instance, created, **kwargs):
 class Genre(models.Model):
     """Модель жанра."""
     name = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name='Hазвание жанра',
         db_index=True,
     )
@@ -114,7 +113,7 @@ class Genre(models.Model):
 class Category(models.Model):
     """Модель категории."""
     name = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name='Hазвание категории',
         db_index=True,
     )
@@ -136,16 +135,16 @@ class Category(models.Model):
 class Title(models.Model):
     """Модель произведения."""
     name = models.CharField(
-        max_length=256,
+        max_length=255,
         verbose_name='Hазвание произведения',
         db_index=True,
     )
-    year = models.PositiveIntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name='год выпуска',
         db_index=True,
         validators=[
             MaxValueValidator(
-                int(datetime.now().year),
+                int(timezone.now().year),
                 message='Значение в поле не должно превышать текущий год.'
             )
         ],
