@@ -147,7 +147,7 @@ class TitleViewingSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         obj = obj.reviews.all().aggregate(rating=Avg('score'))
-        return obj["rating"]
+        return obj['rating']
 
 
 class TitleEditingSerializer(serializers.ModelSerializer):
@@ -156,10 +156,10 @@ class TitleEditingSerializer(serializers.ModelSerializer):
     """
 
     category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(), slug_field="slug"
+        queryset=Category.objects.all(), slug_field='slug'
     )
     genre = serializers.SlugRelatedField(
-        queryset=Genre.objects.all(), slug_field="slug", many=True
+        queryset=Genre.objects.all(), slug_field='slug', many=True
     )
 
     class Meta:
