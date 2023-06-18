@@ -56,6 +56,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор отзывов."""
+
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -85,6 +86,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор комментариев."""
+
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -101,27 +103,24 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """
-    Сериализатор категории.
-    """
+    """Сериализатор категории."""
+
     class Meta:
-        fields = ('name', 'slug', )
         model = Category
+        fields = ('name', 'slug', )
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор жанра.
-    """
+    """Сериализатор жанра."""
+
     class Meta:
         fields = ('name', 'slug', )
         model = Genre
 
 
 class TitleViewingSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор произведения в режиме просмотра.
-    """
+    """Сериализатор произведения в режиме просмотра."""
+
     category = CategorySerializer(
         read_only=True,
     )
@@ -134,6 +133,7 @@ class TitleViewingSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        model = Title
         fields = (
             'id',
             'name',
@@ -143,7 +143,6 @@ class TitleViewingSerializer(serializers.ModelSerializer):
             'genre',
             'category'
         )
-        model = Title
 
     def get_rating(self, obj):
         obj = obj.reviews.all().aggregate(rating=Avg('score'))
@@ -151,9 +150,7 @@ class TitleViewingSerializer(serializers.ModelSerializer):
 
 
 class TitleEditingSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор произведения в режиме создания/редактирования.
-    """
+    """Сериализатор произведения в режиме создания/редактирования."""
 
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug'
@@ -163,6 +160,7 @@ class TitleEditingSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        model = Title
         fields = (
             'id',
             'name',
@@ -171,4 +169,3 @@ class TitleEditingSerializer(serializers.ModelSerializer):
             'genre',
             'category'
         )
-        model = Title

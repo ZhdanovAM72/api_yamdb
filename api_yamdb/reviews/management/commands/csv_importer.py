@@ -17,15 +17,17 @@ model_csv_equal = {
 
 
 class Command(BaseCommand):
-    """Команда для импорта csv в базу
+    """
+    Команда для импорта csv в базу.
     Вызов python3 manage.py csv_importer
-    из терминала в соответствующей папке
+    из терминала в соответствующей папке.
     """
 
     help = 'Импорт csv файлов в таблицы базы.'
 
     def _create_correct_row_fields(self, row):
         """Дополняет строку таблицы экземплярами модели."""
+
         try:
             if row.get('author'):
                 row['author'] = User.objects.get(pk=row['author'])

@@ -8,6 +8,7 @@ from reviews.models import (
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     """Настройка админки для пользователей."""
+
     list_display = (
         'username',
         'email',
@@ -83,6 +84,7 @@ class GenreTitleAdmin(admin.ModelAdmin):
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     """Настройка админ-панели для отзывов."""
+
     list_display = (
         'pk',
         'title',
@@ -99,6 +101,7 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     """Настройка админ-панели для комментариев."""
+
     list_display = (
         'pk',
         'review',

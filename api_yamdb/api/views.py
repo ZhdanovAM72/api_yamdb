@@ -25,6 +25,7 @@ from api.serializers import (CategorySerializer, GenreSerializer,
                              AnyUserSerializer, AdminUsersSerializer,
                              LoginSerializer, TokenSerializer,
                              CommentSerializer, ReviewSerializer)
+from api_yamdb.settings import USER_ME
 from reviews.models import Category, Genre, Title, User, Review
 
 
@@ -66,33 +67,34 @@ class UserViewSet(ModelViewSet):
     lookup_field = 'username'
     filter_backends = (SearchFilter,)
     search_fields = ('username', )
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     @action(
         methods=['GET', 'PATCH'],
         permission_classes=(IsAuthenticated,),
-        url_path='me',
+        url_path=USER_ME,
         detail=False,
     )
     def get_patch_user_info(self, request):
         serializer = AdminUsersSerializer(request.user)
-        if request.method == 'PATCH':
-            if request.user.is_admin:
-                serializer = AdminUsersSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True
-                )
-            else:
-                serializer = AnyUserSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True
-                )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+
+        if request.method != 'PATCH':
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_serializer_class(self):
+        if self.request.user.is_admin:
+            return AdminUsersSerializer
+        return AnyUserSerializer
 
 
 class ApiUserSignup(APIView):
@@ -104,10 +106,12 @@ class ApiUserSignup(APIView):
         """Метод POST."""
 
         serializer = LoginSerializer(data=request.data)
+
         if User.objects.filter(username=request.data.get('username'),
                                email=request.data.get('email')).exists():
             send_confirmation_code(request)
             return Response(request.data, status=status.HTTP_200_OK)
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
         send_confirmation_code(request)
@@ -125,11 +129,8 @@ class GetApiToken(APIView):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        try:
-            user = User.objects.get(username=data['username'])
-        except User.DoesNotExist:
-            return Response({'username': 'Пользователь не найден!'},
-                            status=status.HTTP_404_NOT_FOUND)
+        user = get_object_or_404(User, username=data['username'])
+
         if data.get('confirmation_code') == user.confirmation_code:
             api_token = RefreshToken.for_user(user).access_token
             return Response({'token': str(api_token)},
@@ -141,6 +142,7 @@ class GetApiToken(APIView):
 
 class ReviewViewSet(ModelViewSet):
     """ViewSet отзывов."""
+
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,
                           AuthorOrModeratorsOrReadOnly)
@@ -162,6 +164,7 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     """ViewSet комментариев."""
+
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,
                           AuthorOrModeratorsOrReadOnly)
@@ -172,7 +175,7 @@ class CommentViewSet(ModelViewSet):
             id=self.kwargs.get('review_id'),
             title_id=self.kwargs.get('title_id')
         )
-        return review.comments.all().order_by('id')
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review = get_object_or_404(

@@ -110,7 +110,7 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 # Указываем нашу модель User в качестве используемой
 AUTH_USER_MODEL = 'reviews.User'
 
-# DRF settings, необходимо дописать (фильтры/пагинация)
+# DRF settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -132,3 +132,6 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 EMAIL_ADMIN = 'info@yamdb.ru'
+
+# Константы API
+USER_ME = 'me'

@@ -14,6 +14,7 @@ class AdminAuthorOrReadOnly(permissions.BasePermission):
 
 class AdminOnly(permissions.BasePermission):
     """Только админ."""
+
     def has_permission(self, request, view):
         return (
             request.user.is_authenticated
@@ -27,6 +28,7 @@ class AdminOnly(permissions.BasePermission):
 
 class AdminOrReadOnly(permissions.BasePermission):
     """Админ или только чтение."""
+
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -58,6 +60,8 @@ class AnonReadOnly(permissions.BasePermission):
 
 
 class AdminOrSuperuserOnly(permissions.BasePermission):
+    """Админ/суперпользователь или только чтение."""
+
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
                 or request.user.is_superuser
