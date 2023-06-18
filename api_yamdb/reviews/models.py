@@ -132,12 +132,12 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         verbose_name='год выпуска',
         db_index=True,
-        validators=(
+        validators=[
             MaxValueValidator(
                 int(timezone.now().year),
                 message='Значение в поле не должно превышать текущий год.'
             ),
-        ),
+        ]
     )
     category = models.ForeignKey(
         Category,
