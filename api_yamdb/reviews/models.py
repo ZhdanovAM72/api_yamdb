@@ -216,7 +216,7 @@ class Review(models.Model):
     )
     score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
-        validators=[MinValueValidator(1), MaxValueValidator(10)]
+        validators=(MinValueValidator(1), MaxValueValidator(10))
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -227,12 +227,12 @@ class Review(models.Model):
     class Meta:
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
                 fields=('title', 'author'),
                 name='unique_review'
             )
-        ]
+        )
 
     def __str__(self):
         return self.text[:TEXT_LENGTH]
