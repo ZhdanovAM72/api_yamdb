@@ -15,7 +15,7 @@
 
 ## Команда разработчиков:
 - [Александр Жданов (тимлид, в роли первого разработчика)](https://github.com/ZhdanovAM72)
-- [Yury Zolnikov (в роли второго разработчика)](https://github.com/Kolbacyn)
+- [Зольников Юрий (в роли второго разработчика)](https://github.com/Kolbacyn)
 - [Жанна Ивашова (в роли третьего разработчика)](https://github.com/ZhannaIvashova)
 
 
