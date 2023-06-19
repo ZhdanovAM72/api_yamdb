@@ -1,9 +1,11 @@
-from django.utils import timezone
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.tokens import default_token_generator
 
-from reviews.validators import me_validator
+from reviews.validators import me_validator, validate_year
 
 
 TEXT_LENGTH = 25
@@ -43,7 +45,7 @@ class User(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=255,
+        max_length=max(len(role_name) for role_name, role_dis in CHOICE_ROLE),
         choices=CHOICE_ROLE,
         default=USER,
     )
@@ -75,9 +77,18 @@ class User(AbstractUser):
         return f'{self.username[:TEXT_LENGTH]} {self.role}'
 
 
+@receiver(post_save, sender=User)
+def post_save(sender, instance, created, **kwargs):
+    if created:
+        confirmation_code = default_token_generator.make_token(
+            instance
+        )
+        instance.confirmation_code = confirmation_code
+        instance.save()
+
+
 class Genre(models.Model):
     """Модель жанра."""
-
     name = models.CharField(
         max_length=255,
         verbose_name='Hазвание жанра',
@@ -100,7 +111,6 @@ class Genre(models.Model):
 
 class Category(models.Model):
     """Модель категории."""
-
     name = models.CharField(
         max_length=255,
         verbose_name='Hазвание категории',
@@ -123,7 +133,6 @@ class Category(models.Model):
 
 class Title(models.Model):
     """Модель произведения."""
-
     name = models.CharField(
         max_length=255,
         verbose_name='Hазвание произведения',
@@ -132,12 +141,7 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         verbose_name='год выпуска',
         db_index=True,
-        validators=[
-            MaxValueValidator(
-                int(timezone.now().year),
-                message='Значение в поле не должно превышать текущий год.'
-            ),
-        ]
+        validators=(validate_year, ),
     )
     category = models.ForeignKey(
         Category,
@@ -191,7 +195,6 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     """Модель отзыва."""
-
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -207,7 +210,7 @@ class Review(models.Model):
     )
     score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
-        validators=(MinValueValidator(1), MaxValueValidator(10))
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -218,12 +221,12 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        constraints = (
+        constraints = [
             models.UniqueConstraint(
                 fields=('title', 'author'),
                 name='unique_review'
-            ),
-        )
+            )
+        ]
 
     def __str__(self):
         return self.text[:TEXT_LENGTH]
@@ -231,7 +234,6 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Модель комментария."""
-
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
