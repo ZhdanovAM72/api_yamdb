@@ -70,7 +70,7 @@ class UserViewSet(ModelViewSet):
     http_method_names = ('get', 'post', 'patch', 'delete')
 
     @action(
-        methods=['GET', 'PATCH'],
+        methods=('GET', 'PATCH'),
         permission_classes=(IsAuthenticated,),
         url_path=USER_ME,
         detail=False,
