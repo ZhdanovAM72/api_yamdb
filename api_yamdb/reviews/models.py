@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
 
-from reviews.validators import me_validator
+from reviews.validators import me_validator, validate_year
 
 
 TEXT_LENGTH = 25
@@ -132,12 +132,7 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         verbose_name='год выпуска',
         db_index=True,
-        validators=[
-            MaxValueValidator(
-                int(timezone.now().year),
-                message='Значение в поле не должно превышать текущий год.'
-            ),
-        ]
+        validators=(validate_year,),
     )
     category = models.ForeignKey(
         Category,
