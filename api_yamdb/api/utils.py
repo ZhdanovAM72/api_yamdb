@@ -21,3 +21,4 @@ def send_confirmation_code(request):
         f'{EMAIL_ADMIN}',
         [request.data.get('email')],
     )
+ 

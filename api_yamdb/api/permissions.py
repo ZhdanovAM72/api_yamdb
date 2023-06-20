@@ -73,3 +73,4 @@ class AdminOrSuperuserOnly(permissions.BasePermission):
             or request.user.is_superuser
             or request.user.is_admin
         )
+ 

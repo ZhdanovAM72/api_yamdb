@@ -169,3 +169,4 @@ class TitleEditingSerializer(serializers.ModelSerializer):
             'genre',
             'category'
         )
+ 

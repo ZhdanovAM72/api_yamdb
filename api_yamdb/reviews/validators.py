@@ -20,3 +20,4 @@ def validate_year(value):
         raise ValidationError(
             'Год не может быть больше текущего года.'
         )
+ 

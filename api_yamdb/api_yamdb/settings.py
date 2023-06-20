@@ -135,3 +135,4 @@ EMAIL_ADMIN = 'info@yamdb.ru'
 
 # Константы API
 USER_ME = 'me'
+ 
